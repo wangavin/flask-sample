@@ -1,13 +1,14 @@
 from flask import Flask, render_template, jsonify
 import psycopg2
 
-app = Flask(__name__)
+application = Flask(__name__)
+app = application
 
-@app.route('/')
+@application.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/data')
+@application.route('/data')
 def get_data():
     # Connect to the database
     conn = psycopg2.connect(database="tornadoes_db",
@@ -32,4 +33,4 @@ def get_data():
     return jsonify(data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    application.run(debug=True)
