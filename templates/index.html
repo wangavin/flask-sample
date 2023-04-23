@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My App</title>
+  </head>
+  <body>
+    <h1>Tornado Data</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Month</th>
+          <th>State</th>
+          <th>Magnitude</th>
+          <th>Injuries</th>
+          <th>Fatalities</th>
+          <th>Starting latitude</th>
+          <th>Starting longitude</th>
+          <th>Length</th>
+          <th>Width</th>
+        </tr>
+      </thead>
+      <tbody id="table-data">
+        <!-- Table rows will be dynamically generated here -->
+      </tbody>
+    </table>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+      // Use D3.js to fetch and parse the data from the Flask app
+      d3.json('/data').then(function(data) {
+        // Select the table body element
+        var tbody = d3.select('#table-data');
+
+        // Append a table row for each item in the data array
+        var rows = tbody.selectAll('tr')
+          .data(data)
+          .enter()
+          .append('tr');
+
+        // Append a table cell for each property of each item in the data array
+        var cells = rows.selectAll('td')
+          .data(function(row) {
+            return Object.values(row);
+          })
+          .enter()
+          .append('td')
+          .text(function(d) {
+            return d;
+          });
+      });
+    </script>
+  </body>
+</html>

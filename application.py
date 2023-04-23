@@ -1,46 +1,35 @@
-from flask import Flask
+from flask import Flask, render_template, jsonify
+import psycopg2
 
-application = Flask(__name__)
+app = Flask(__name__)
 
-@application.route('/')
-def hello_world():
-     return 'whats up'
-# import os
-# from flask import Flask, render_template, jsonify
-# from sqlalchemy import create_engine
-# from sqlalchemy.orm import scoped_session, sessionmaker
-# from sqlalchemy.pool import NullPool
+@app.route('/')
+def index():
+    return render_template('index.html')
 
+@app.route('/data')
+def get_data():
+    # Connect to the database
+    conn = psycopg2.connect(database="tornadoes_db",
+                            user="postgres",
+                            password="project3",
+                            host="database-2.cjrkxejkebqc.us-east-1.rds.amazonaws.com", port="5432")
 
-# application = Flask(__name__)
-# app = application
+    # create a cursor
+    cur = conn.cursor()
 
-# # Set up database
-# db_file = os.path.join("data", "yrmomaginjfatslonslatstlenwid.sqlite")
-# engine = create_engine(f"sqlite:///{db_file}", poolclass=NullPool)
+    # Select all products from the table
+    cur.execute('''SELECT yr, mo, st, mag, inj, fat, slat, slon, len, wid FROM tornadoes_project''')
 
-# db = scoped_session(sessionmaker(bind=engine))
+    # Fetch the data
+    data = cur.fetchall()
 
-# @application.route('/')
-# def index():
-#     data = load_db_data()
-#     return render_template('index.html', data=data)
+    # close the cursor and connection
+    cur.close()
+    conn.close()
 
-# @application.route('/data')
-# def load_db_data():
-#     # Select the desired columns
-    
-#     selected_columns = ['yr', 'mo', 'mag', 'inj', 'fat', 'slon', 'slat', 'st', 'len', 'wid']
+    # return the data as JSON
+    return jsonify(data)
 
-#     # Execute a raw SQL query to fetch the data
-#     data = db.execute(f"SELECT {', '.join(selected_columns)} FROM tornado_data").fetchall()
-
-#     # Convert the fetched data to a JSON-friendly format
-#     result = []
-#     for row in data:
-#         result.append(dict(zip(selected_columns, row)))
-
-#     return jsonify(result)
-
-# if __name__ == '__main__':
-#     application.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
